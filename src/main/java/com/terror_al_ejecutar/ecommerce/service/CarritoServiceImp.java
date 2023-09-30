@@ -1,7 +1,9 @@
 package com.terror_al_ejecutar.ecommerce.service;
 
 import com.terror_al_ejecutar.ecommerce.dto.CarritoDto;
+import com.terror_al_ejecutar.ecommerce.dto.ProductoEnCarritoDTO;
 import com.terror_al_ejecutar.ecommerce.models.Carrito;
+import com.terror_al_ejecutar.ecommerce.models.CarritoProductos;
 import com.terror_al_ejecutar.ecommerce.models.Productos;
 import com.terror_al_ejecutar.ecommerce.models.User;
 import com.terror_al_ejecutar.ecommerce.repository.CarritoProductosRepository;
@@ -30,6 +32,10 @@ public class CarritoServiceImp implements CarritoService{
     private CarritoProductosRepository carritoProductosRepository;
 
 
+    @Autowired
+    private CarritoProductosService carritoProductosService;
+
+
 
 
     @Override
@@ -45,6 +51,15 @@ public class CarritoServiceImp implements CarritoService{
         carritoDto.setId(carrito.getId());
         carritoDto.setUserId(carrito.getUsuario().getId());
         carritoDto.setUserName(carrito.getUsuario().getNombre());
+        List<CarritoProductos> carritoProductosList = (carritoProductosRepository.findByCarrito_Id(carrito.getId()));
+        List<ProductoEnCarritoDTO> productoEnCarritoDTOList = new ArrayList<>();
+        for (CarritoProductos carritoProductos:
+             carritoProductosList) {
+            ProductoEnCarritoDTO productoEnCarritoDTO = new ProductoEnCarritoDTO(carritoProductos.getProductos().getId(), 1 );
+            productoEnCarritoDTOList.add(productoEnCarritoDTO);
+
+        }
+        carritoDto.setProductosList(productoEnCarritoDTOList);
         return carritoDto;
     }
 
@@ -61,7 +76,8 @@ public class CarritoServiceImp implements CarritoService{
         newCarrito.setUsuario(usuario);
         newCarrito.setTotal(600);
         carritoRepository.save(newCarrito);
-        CarritoProductosService carritoProductosService = new CarritoProductosServiceImp();
+        List<ProductoEnCarritoDTO> productoEnCarritoDTOList = new ArrayList<>();
+        ProductoEnCarritoDTO productoEnCarritoDTO = null;
         carritoProductosService.createCarritoProductos(carritoDto.getProductosList(), newCarrito);
 
     }

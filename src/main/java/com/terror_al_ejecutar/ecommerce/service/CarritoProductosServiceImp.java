@@ -24,19 +24,11 @@ public class CarritoProductosServiceImp implements CarritoProductosService{
     private CarritoProductosRepository carritoProductosRepository;
     @Override
     public void createCarritoProductos(List<ProductoEnCarritoDTO> productosList, Carrito carrito) {
-        productosList.forEach(
-                (ProductoEnCarritoDTO productos) -> {
-                        Productos producto = productosRepository.findById(productos.getProductoId()).get();
-                        CarritoProductos carritoProductos = new CarritoProductos();
-                        carritoProductos.setProductos(producto);
-                        carritoProductos.setCarrito(carrito);
-                        carritoProductosRepository.save(carritoProductos);
-
-
-
-
-
-                }
-        );
+        productosList.stream().map(productos -> productosRepository.findById(productos.getProductoId()).get()).forEach(producto -> {
+            CarritoProductos carritoProductos = new CarritoProductos();
+            carritoProductos.setProductos(producto);
+            carritoProductos.setCarrito(carrito);
+            carritoProductosRepository.save(carritoProductos);
+        });
     }
 }
