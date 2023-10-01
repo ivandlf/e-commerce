@@ -51,14 +51,21 @@ public class CarritoServiceImp implements CarritoService{
         carritoDto.setId(carrito.getId());
         carritoDto.setUserId(carrito.getUsuario().getId());
         carritoDto.setUserName(carrito.getUsuario().getNombre());
-        List<CarritoProductos> carritoProductosList = (carritoProductosRepository.findByCarrito_Id(carrito.getId()));
+        List<CarritoProductos> carritoProductosList = carritoProductosRepository.findByCarrito_Id(carrito.getId());
         List<ProductoEnCarritoDTO> productoEnCarritoDTOList = new ArrayList<>();
         for (CarritoProductos carritoProductos:
              carritoProductosList) {
-            ProductoEnCarritoDTO productoEnCarritoDTO = new ProductoEnCarritoDTO(carritoProductos.getProductos().getId(), 1 );
+            ProductoEnCarritoDTO productoEnCarritoDTO = new ProductoEnCarritoDTO(carritoProductos.getProductos().getId(), carritoProductos.getQuantity());
             productoEnCarritoDTOList.add(productoEnCarritoDTO);
 
         }
+        int total = 0;
+        for (ProductoEnCarritoDTO productoList : productoEnCarritoDTOList) {
+            Productos productos = productosRepository.findById(productoList.getProductoId()).get();
+            total += productos.getPrecio() * productoList.getQuantity();
+
+        }
+        carritoDto.setTotal(total);
         carritoDto.setProductosList(productoEnCarritoDTOList);
         return carritoDto;
     }
@@ -74,10 +81,14 @@ public class CarritoServiceImp implements CarritoService{
         User usuario = userRepository.findById(carritoDto.getUserId()).get();
         Carrito newCarrito = new Carrito();
         newCarrito.setUsuario(usuario);
-        newCarrito.setTotal(600);
+        int total = 0;
+        List<ProductoEnCarritoDTO> productoEnCarritoDTOList = carritoDto.getProductosList();
+        for (ProductoEnCarritoDTO productoList : productoEnCarritoDTOList) {
+            Productos productos = productosRepository.findById(productoList.getProductoId()).get();
+            total += productos.getPrecio() * productoList.getQuantity();
+        }
+        newCarrito.setTotal(total);
         carritoRepository.save(newCarrito);
-        List<ProductoEnCarritoDTO> productoEnCarritoDTOList = new ArrayList<>();
-        ProductoEnCarritoDTO productoEnCarritoDTO = null;
         carritoProductosService.createCarritoProductos(carritoDto.getProductosList(), newCarrito);
 
     }

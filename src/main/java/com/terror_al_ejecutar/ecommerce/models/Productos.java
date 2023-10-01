@@ -14,7 +14,7 @@ public class Productos {
     @Column(name = "nombre")
     private String nombre;
     @Column(name = "precio")
-    private String precio;
+    private Integer precio;
     @Column(name = "descripcion")
     private String descripcion;
     @Column(name = "stock")

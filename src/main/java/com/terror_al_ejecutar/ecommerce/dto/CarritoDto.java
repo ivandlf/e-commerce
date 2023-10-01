@@ -15,4 +15,5 @@ public class CarritoDto {
     private Long userId;
     private String userName;
     private List<ProductoEnCarritoDTO> productosList;
+    private Integer total;
 }
